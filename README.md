@@ -2,7 +2,7 @@
 
 A single-page, static documentation site built with **Next.js 16 + MDX**, containing an original, beginner-friendly tutorial on recording and replaying integration tests for a Go application with [Keploy](https://keploy.io) — using the Gin + MongoDB URL-shortener quickstart ([samples-go/gin-mongo](https://github.com/keploy/samples-go/tree/main/gin-mongo)).
 
-🔗 **Live repo:** [github.com/khushi-infinity/Made-easy-keploy](https://github.com/khushi-infinity/Made-easy-keploy)
+🔗 **Live site:** https://keploy-docs-site.vercel.app · 🔗 **Live repo:** [github.com/khushi-infinity/Made-easy-keploy](https://github.com/khushi-infinity/Made-easy-keploy)
 
 This is the code for a Keploy DevRel candidate assignment.
 

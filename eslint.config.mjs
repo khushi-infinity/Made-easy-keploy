@@ -1,18 +1,21 @@
-import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+import pluginJs from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import globals from 'globals';
 
-const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
-  // Override default ignores of eslint-config-next.
-  globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-  ]),
-]);
-
-export default eslintConfig;
+/** @type {import('eslint').Linter.Config[]} */
+export default [
+  { ignores: ['dist', '.next', 'out', 'scripts/**', 'eslint.config.mjs'] },
+  ...tseslint.configs.recommended,
+  {
+    files: ['**/*.{ts,tsx,js,jsx}'],
+    ...pluginJs.configs.recommended,
+    languageOptions: {
+      parser: tseslint.parser,
+      globals: { ...globals.browser, ...globals.node },
+    },
+    rules: {
+      // Next.js App Router uses the new JSX transform — no React import needed
+      'no-undef': 'off',
+    },
+  },
+];

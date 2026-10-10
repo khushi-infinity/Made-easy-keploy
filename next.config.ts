@@ -1,17 +1,20 @@
 import type { NextConfig } from "next";
+import createMDX from "@next/mdx";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
-  turbopack: {
-    rules: {
-      "*.css": {
-        loaders: ["@tailwindcss/turbopack"],
-        as: "*.css",
-      },
-    },
+  pageExtensions: ["ts", "tsx", "md", "mdx"],
+  output: "export",
+  images: {
+    unoptimized: true,
   },
 };
 
-export default nextConfig;
+const withMDX = createMDX({
+  // Turbopack requires plugin names as strings (not imported functions).
+  options: {
+    remarkPlugins: ["remark-gfm"],
+    rehypePlugins: [["rehype-highlight", { detect: true }]],
+  },
+});
+
+export default withMDX(nextConfig);

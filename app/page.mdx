@@ -1,0 +1,407 @@
+import { Callout } from "@/components/callout";
+import { Steps, Step } from "@/components/steps";
+import { FlowDiagram } from "@/components/flow-diagram";
+
+# Record & Replay Tests for a Go App — Zero Test Code
+
+**Audience:** you've heard of Keploy, you write (or at least *read*) Go, and you
+hate writing test scaffolding. That's all the setup you need.
+
+**What you'll build:** a working test suite for a real REST API — a URL
+shortener powered by **Gin** (a Go web framework) and **MongoDB** — with
+**zero hand-written test code**. No mocks stubbed by hand, no fixtures
+copy-pasted from Stack Overflow. Just the API traffic you were going to send
+anyway, turned into tests by watching.
+
+<Callout type="info">
+**The 60-second pitch:** Keploy sits *between* your application and the
+outside world. When you run it in **record** mode, it captures every incoming
+HTTP call and every outgoing database call, and writes them to your repo as
+YAML files. Later, **test** mode replays those exact calls — and fakes the
+database responses — asserting your app still behaves identically. Like a
+flight recorder for API traffic.
+</Callout>
+
+## Why should a Go developer care?
+
+Because the three most annoying parts of integration testing simply disappear:
+
+| Pain | Without Keploy | With Keploy |
+| --- | --- | --- |
+| Writing mocks | Hand-stub every DB call | Auto-generated `mocks.yaml` |
+| Keeping data clean | Seed scripts, teardown chores | Database is faked — nothing to clean |
+| Test drift | Tests rot as code changes | Re-record in seconds |
+
+The key insight: **your API traffic is already a test suite**. Keploy just
+saves it from being lost forever the moment your `curl` finishes.
+
+<FlowDiagram />
+
+## What you'll need
+
+Before starting, make sure you have:
+
+- **Go 1.20+** installed — check with `go version`
+- **Docker** running — we'll use it only for MongoDB
+- **Keploy CLI** — if you don't have it yet:
+
+```bash
+curl --silent -O -L https://keploy.io/install.sh && source install.sh
+
+# verify it works
+keploy -v
+```
+
+<Callout type="note">
+Tested on **macOS (Apple Silicon)** and **Linux**. On Windows, run everything
+inside WSL2. Full install instructions live in the
+[official installation guide](https://keploy.io/docs/server/installation/).
+</Callout>
+
+## Quickstart
+
+In a hurry? Here's the whole flow in five commands:
+
+```bash
+# 1. clone the sample app
+git clone https://github.com/keploy/samples-go.git && cd samples-go/gin-mongo
+
+# 2. start MongoDB in Docker
+docker run --rm -d -p 27017:27017 --name mongoDb mongo
+
+# 3. record a test suite
+sudo -E keploy record -c "go run main.go handler.go"
+
+# 4. hit the API (in another terminal)
+curl --request POST \
+  --url http://localhost:8080/url \
+  --header 'content-type: application/json' \
+  --data '{"url": "https://google.com"}'
+
+# 5. replay your test suite
+sudo -E keploy test -c "go run main.go handler.go" --delay 10
+```
+
+Everything below explains what just happened — and the two traps most people
+hit on their first run.
+
+---
+
+## Step 1 — Clone the sample app
+
+We'll use Keploy's official **gin-mongo** sample: a URL shortener that
+`POST`s a long URL and returns a short one.
+
+```bash
+git clone https://github.com/keploy/samples-go.git
+cd samples-go/gin-mongo
+go mod download
+```
+
+Peek inside — there are only two files worth knowing:
+
+<Steps>
+<Step number={1} title="main.go — the wiring">
+  Connects to MongoDB on `localhost:27017`, sets up Gin routes, starts the
+  server on port `8080`.
+</Step>
+<Step number={2} title="handler.go — the handlers">
+  `POST /url` shortens a URL; `GET /:shortUrl` redirects back to the
+  original. Each handler calls MongoDB directly.
+</Step>
+</Steps>
+
+That's the whole app. Which is exactly the point — you don't need a big
+codebase to see the value.
+
+## Step 2 — Start MongoDB
+
+The app needs a MongoDB to talk to. One container is all it takes:
+
+```bash
+docker run --rm -d -p 27017:27017 --name mongoDb mongo
+```
+
+Quick sanity check that it's alive:
+
+```bash
+docker ps --filter name=mongoDb
+```
+
+## Step 3 — Record your test suite
+
+This is the fun part. Tell Keploy to run your app and watch everything that
+happens:
+
+```bash
+sudo -E keploy record -c "go run main.go handler.go"
+```
+
+You'll see Keploy's banner, then your app's startup logs. **Keep this terminal
+open** — it's now half-recorder, half-app-host.
+
+### Send your first request
+
+In a *new* terminal:
+
+```bash
+curl --request POST \
+  --url http://localhost:8080/url \
+  --header 'content-type: application/json' \
+  --data '{"url": "https://google.com"}'
+```
+
+You'll get something like:
+
+```json
+{
+  "ts": 1645540022,
+  "url": "http://localhost:8080/Lhr4BWAi"
+}
+```
+
+Behind the scenes, two things just happened:
+
+1. Your request hit the app and was served normally — you got a real,
+   working response.
+2. *At the same time*, Keploy cloned that request/response pair into a
+   **test case**, and cloned the MongoDB call your handler made into a
+   **data mock**.
+
+### Send a second request
+
+Let's capture one more so the test suite isn't a monoculture:
+
+```bash
+curl --request GET \
+  --url http://localhost:8080/Lhr4BWAi
+```
+
+This should redirect you back to `https://google.com`.
+
+### Keep the original URL handy
+
+Notice that `Lhr4BWAi` is randomly generated. **Save the short URL you
+actually got** — you'll need it in Step 5 to verify the redirect replays
+correctly.
+
+## Step 4 — Understand what got recorded
+
+Stop the recording (`Ctrl+C`) and look at what appeared in your project:
+
+```
+gin-mongo/
+├── keploy/
+│   ├── test-1.yml     ← the POST /url request + response
+│   ├── test-2.yml     ← the GET /Lhr4BWAi request + response
+│   ├── mocks/
+│   │   └── mocks-1.yml  ← the MongoDB calls, in wire protocol detail
+│   ├── reports/
+│   │   └── test-run-...json  ← the outcome of the last keploy test run
+│   └── suite-*.yaml
+```
+
+Open `test-1.yml`. This whole file is a test you did not write:
+
+```yaml
+version: api.keploy.io/v1beta2
+kind: Http
+name: test-1
+spec:
+  metadata: {}
+  req:
+    method: POST
+    proto_major: 1
+    proto_minor: 1
+    url: http://localhost:8080/url
+    header:
+      Accept: "*/*"
+      Content-Length: "33"
+      Content-Type: application/json
+      Host: localhost:8080
+      User-Agent: curl/7.77.0
+    body: |-
+      {
+        "url": "https://google.com"
+      }
+    body_type: ""
+  resp:
+    status_code: 200
+    header:
+      Content-Length: "65"
+      Content-Type: application/json; charset=utf-8
+      Date: Sun, 01 Oct 2023 15:15:47 GMT
+    body: '{"ts":1696173347979970488,"url":"http://localhost:8080/Lhr4BWAi"}'
+    body_type: ""
+    status_message: ""
+    proto_major: 0
+    proto_minor: 0
+  objects: []
+  assertions:
+    noise:
+      - header.Date
+  created: 1696173352
+```
+
+Notice the `assertions.noise` block — Keploy already added `header.Date`,
+because it knows HTTP responses contain headers that will legitimately
+differ between the first run and every future one.
+
+<Callout type="aha" title="The test you never wrote">
+Here's the mind-bender: this YAML **is** a test suite, but it's also the last
+thing you'd want to edit by hand. The only part of these files you'll ever
+touch is `noise` — everything else is diffed and reported automatically.
+</Callout>
+
+Now check `mocks/mocks-1.yml`. That's Keploy having a conversation with
+MongoDB — on MongoDB's own wire protocol. Every query your handler made,
+transcribed.
+
+<Callout type="tip" title="Mocks = your test database">
+The mocks are the reason you won't need a live MongoDB when you run tests —
+Step 5 runs the *entire* test suite with MongoDB turned off on purpose.
+</Callout>
+
+## Step 5 — Replay your tests
+
+Time to find out if your app survived being frozen into YAML. Stop any
+running processes (including the recorder and MongoDB, if you like) and run:
+
+```bash
+sudo -E keploy test -c "go run main.go handler.go" --delay 10
+```
+
+Keploy starts your app, then replays each test case:
+
+- Feeds the recorded request into your server.
+- For each MongoDB call your handler makes, it answers with the recorded
+  mock instead of the real database.
+- Compares the response your app produces now against the recorded
+  response, ignoring the noise fields.
+
+Expected output (all green):
+
+```
+running tests...
+    1. test-1 (OK)       ✓
+    2. test-2 (OK)       ✓
+total tests: 2, passed: 2, failed: 0
+```
+
+### Read the failure (if you get one)
+
+The most likely first-run failure is `body.ts` — the timestamp the URL
+shortener embeds in every response. It's different every run, so Keploy will
+complain about a diff. Fix it by telling Keploy to ignore it:
+
+```yaml
+# edit keploy/test-1.yml, near the bottom
+assertions:
+  noise:
+    - header.Date
+    - body.ts
+```
+
+Now re-run the `keploy test` command and everything goes green.
+
+<Callout type="warning" title="The --delay flag">
+`--delay 10` gives your app 10 seconds to start up before Keploy starts
+replaying tests. On a cold start (or slower machine), bump this up. If tests
+fail with a connection-refused error, this is almost always why.
+</Callout>
+
+## Step 6 — The moment that changes your workflow
+
+Time to break your app *on purpose* and see whether Keploy notices.
+
+Open `handler.go` and tweak what a handler returns — a status code, a field,
+whatever. Then re-run:
+
+```bash
+sudo -E keploy test -c "go run main.go handler.go" --delay 10
+```
+
+You'll see something like this — Keploy pinpoints exactly *which* test
+failed and *what field* diffed:
+
+```
+running tests...
+    1. test-1 (FAIL)    ✗ — response body differs
+    2. test-2 (OK)      ✓
+total tests: 2, passed: 1, failed: 1
+```
+
+Delete the YAML files and re-record whenever you *want* the behavior to
+change. This is now your inner loop:
+
+| Change | What to do |
+| --- | --- |
+| Refactor internals | `keploy test` — should still pass |
+| Change API behavior | Re-record: `keploy record`, then replay |
+
+---
+
+## Gotchas I hit (so you don't have to)
+
+<Callout type="warning" title="MongoDB must be up before recording">
+If `keploy record` starts your app but it immediately dies with
+`server selection error`, the MongoDB container isn't running:
+
+```bash
+docker ps --filter name=mongoDb
+docker start mongoDb
+```
+</Callout>
+
+<Callout type="warning" title="Port already in use">
+If you get `address localhost:8080 already in use`, some zombie process
+holds the port. Find and kill it:
+
+```bash
+lsof -i :8080
+kill -9 <PID>
+```
+</Callout>
+
+**Go version mismatch.** If `go mod download` fails with a version hint,
+update your local Go — the sample targets a recent toolchain.
+
+**Don't hand-tune test files.** The urge to "fix" a `test-2.yml` response by
+hand is strong. Resist it. Add `noise`, change source code, or re-record —
+nothing else.
+
+<Callout type="tip" title="Commit these files">
+The `keploy/` directory is plain YAML that diffs cleanly in code review. Once
+the team trusts the suites, adding a `keploy test` step to CI is a totally
+reasonable next move.
+</Callout>
+
+## What Keploy is *not*
+
+To keep expectations honest:
+
+- **Not a unit-test replacement** — Keploy handles integration-level
+  behavior, not individual function logic.
+- **Not magic against true randomness** — anything with genuinely random
+  outputs (e.g. calling a live payment API) needs careful `noise` tuning.
+- **Not a load-testing or fuzzing tool** — it's a capture-replay harness.
+
+## Where to go next
+
+- 📖 [Keploy official docs](https://keploy.io/docs/) — including the
+  [original Gin + MongoDB quickstart](https://keploy.io/docs/quickstart/samples-gin/)
+  that inspired this page.
+- 🧪 Browse the
+  [samples-go repository](https://github.com/keploy/samples-go)
+  to see the same flow with Echo, Mux, Postgres, Redis, and more.
+- 💬 Join the
+  [Keploy Slack community](https://join-slack.keploy.io/) if you get stuck —
+  the maintainers are genuinely responsive.
+
+## Wrapping up
+
+You turned two `curl` calls into two replayable test cases, complete with
+auto-generated database mocks. The next time someone asks "did you write
+tests for that?" you can honestly say *"no, I just used the API and recorded
+what it did"* — and that's the highest compliment a testing tool can hope
+for.

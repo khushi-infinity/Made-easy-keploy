@@ -1,42 +1,20 @@
-const styles: Record<
-  string,
-  { icon: string; title: string; border: string; bg: string; text: string }
-> = {
-  info: {
-    icon: "ℹ️",
-    title: "Info",
-    border: "#3b82f6",
-    bg: "rgba(59,130,246,0.08)",
-    text: "#1d4ed8",
-  },
-  tip: {
-    icon: "💡",
-    title: "Tip",
-    border: "#10b981",
-    bg: "rgba(16,185,129,0.08)",
-    text: "#047857",
-  },
-  warning: {
-    icon: "⚠️",
-    title: "Warning",
-    border: "#f59e0b",
-    bg: "rgba(245,158,11,0.10)",
-    text: "#b45309",
-  },
-  note: {
-    icon: "📝",
-    title: "Note",
-    border: "#a1a1aa",
-    bg: "rgba(161,161,170,0.10)",
-    text: "#52525b",
-  },
-  aha: {
-    icon: "✨",
-    title: "A-ha! Moment",
-    border: "#a855f7",
-    bg: "rgba(168,85,247,0.08)",
-    text: "#7e22ce",
-  },
+const PILL =
+  "inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider";
+
+const PILLER: Record<string, string> = {
+  info: `${PILL} bg-[#eaf3ff] text-[#1d4ed8] dark:bg-[#171f2e] dark:text-[#7fb1ff]`,
+  tip: `${PILL} bg-[#e8f8ee] text-[#15803d] dark:bg-[#14261b] dark:text-[#6fd692]`,
+  warning: `${PILL} bg-[var(--accent-soft)] text-[var(--accent-hover)] dark:bg-[#241610] dark:text-[#ff9a63]`,
+  note: `${PILL} bg-[var(--card)] text-[var(--muted)]`,
+  aha: `${PILL} bg-[#f5edff] text-[#7e22ce] dark:bg-[#211730] dark:text-[#c084fc]`,
+};
+
+const ICON: Record<string, string> = {
+  info: "i",
+  tip: "→",
+  warning: "!",
+  note: "n",
+  aha: "★",
 };
 
 export function Callout({
@@ -48,25 +26,19 @@ export function Callout({
   title?: string;
   children: React.ReactNode;
 }) {
-  const s = styles[type] ?? styles.info;
+  const label = title ?? type;
   return (
-    <aside
-      className="not-prose my-4 rounded-lg border-l-4 p-4 text-sm leading-relaxed"
-      style={{
-        borderColor: s.border,
-        background: s.bg,
-        borderLeftWidth: 4,
-        borderLeftStyle: "solid",
-        borderWidth: 1,
-      }}
-    >
-      <p className="mb-1 font-semibold" style={{ color: s.text }}>
-        <span aria-hidden="true">{s.icon}</span>{" "}
-        {title ? `${title} · ${s.title}` : s.title}
+    <aside className="my-5 rounded-lg border border-[var(--border)] bg-[var(--card)]/70 p-4">
+      <p className={`mb-2 ${PILLER[type] ?? PILLER.note}`}>
+        <span
+          aria-hidden="true"
+          className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-current text-[9px] font-bold leading-none"
+        >
+          {ICON[type] ?? ICON.info}
+        </span>
+        {label}
       </p>
-      <div className="text-[var(--fg)] [&_a]:underline [&_code]:before:content-none [&_code]:after:content-none">
-        {children}
-      </div>
+      <div className="text-sm leading-relaxed text-[var(--fg)]">{children}</div>
     </aside>
   );
 }

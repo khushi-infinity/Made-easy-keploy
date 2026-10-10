@@ -1,27 +1,40 @@
 @import "tailwindcss";
-@import "highlight.js/styles/github.css" (prefers-color-scheme: light);
-@import "highlight.js/styles/github-dark.css" (prefers-color-scheme: dark);
+
+/* ------------------------------------------------------------------ */
+/* Keploy brand palette: dark charcoal + signal orange (#FF5F15).      */
+/* Extracted from keploy.io. Orange is used sparingly for accents,     */
+/* active states, and one highlighted box. Everything else is neutral. */
+/* ------------------------------------------------------------------ */
 
 :root {
   --bg: #ffffff;
-  --fg: #17171c;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  --card: #f9fafb;
-  --accent: #4f46e5;
-  --accent-soft: rgba(79, 70, 229, 0.08);
-  --code-bg: #f6f8fa;
+  --fg: #1a1a1a;
+  --muted: #5f6368;
+  --border: #e4e6ea;
+  --card: #f7f7f8;
+  --code-bg: #f4f5f6;
+  --accent: #ff5f15;
+  --accent-hover: #e64a00;
+  --accent-soft: #fff3ec;
+
+  /* syntax */
+  --hljs-bg: #1e1e24;
+  --hljs-base: #d6d9dd;
 }
 
 :root[data-theme="dark"] {
-  --bg: #0b0d12;
-  --fg: #e6e8ee;
-  --muted: #9aa1ad;
-  --border: #1f2430;
-  --card: #12151d;
-  --accent: #8b8df8;
-  --accent-soft: rgba(139, 141, 248, 0.12);
-  --code-bg: #161a22;
+  --bg: #101012;
+  --fg: #ececee;
+  --muted: #a3a7ad;
+  --border: #26262a;
+  --card: #17171a;
+  --code-bg: #1e1e24;
+  --accent: #ff7a3d;
+  --accent-hover: #ff8f5c;
+  --accent-soft: #211612;
+
+  --hljs-bg: #0d0d10;
+  --hljs-base: #c9ccd2;
 }
 
 html {
@@ -31,63 +44,183 @@ html {
   color-scheme: dark;
 }
 
-/* ---------- MDX typography ---------- */
-
-.mdx-content {
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
-  line-height: 1.75;
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
 }
 
+/* ------------------------------------------------------------------ */
+/* Highlight.js theme (driven by CSS vars so it follows dark mode)     */
+/* ------------------------------------------------------------------ */
+
+.hljs {
+  color: var(--hljs-base);
+  background: var(--hljs-bg);
+}
+.hljs-comment,
+.hljs-quote {
+  color: #7c828c;
+  font-style: italic;
+}
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-section,
+.hljs-doctag,
+.hljs-type,
+.hljs-name,
+.hljs-strong {
+  color: #ff8f5c;
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #9ece6a;
+}
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-subst {
+  color: #e0af68;
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.function_,
+.hljs-built_in,
+.hljs-class {
+  color: #7dcfff;
+}
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-selector-attr,
+.hljs-selector-class {
+  color: #d6d9dd;
+}
+.hljs-deletion {
+  color: #f7768e;
+}
+.hljs-emphasis {
+  font-style: italic;
+}
+
+/* ------------------------------------------------------------------ */
+/* MDX content typography                                              */
+/* ------------------------------------------------------------------ */
+
+.mdx-content {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--fg);
+  word-wrap: break-word;
+}
+
+.mdx-content > *:first-child {
+  margin-top: 0;
+}
+
+/* headings: tight, quiet, with orange anchor link on hover */
 .mdx-content h1 {
-  font-size: 2.25rem;
+  font-size: 2.1rem;
   line-height: 1.2;
   font-weight: 800;
-  letter-spacing: -0.02em;
-  margin-top: 1rem;
-  margin-bottom: 1.25rem;
+  letter-spacing: -0.025em;
+  margin: 0 0 1.25rem 0;
 }
 
 .mdx-content h2 {
-  font-size: 1.5rem;
+  position: relative;
+  font-size: 1.45rem;
   font-weight: 700;
-  margin-top: 2.5rem;
-  margin-bottom: 1rem;
-  scroll-margin-top: 5rem;
+  letter-spacing: -0.015em;
+  margin: 2.75rem 0 1rem 0;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+  scroll-margin-top: 5.5rem;
 }
 
 .mdx-content h3 {
-  font-size: 1.15rem;
-  font-weight: 600;
-  margin-top: 1.75rem;
-  margin-bottom: 0.75rem;
+  position: relative;
+  font-size: 1.12rem;
+  font-weight: 650;
+  margin: 1.75rem 0 0.6rem 0;
+  scroll-margin-top: 5.5rem;
+}
+
+.mdx-content h2:hover .anchor,
+.mdx-content h3:hover .anchor {
+  opacity: 1;
+}
+
+.mdx-content .anchor {
+  opacity: 0;
+  margin-left: 0.45rem;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 400;
+  transition: opacity 0.15s ease;
 }
 
 .mdx-content p {
-  margin-bottom: 1rem;
-  color: var(--fg);
+  margin-bottom: 1.1rem;
 }
 
 .mdx-content a {
   color: var(--accent);
   text-decoration: underline;
-  text-decoration-style: dotted;
+  text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
 
+.mdx-content a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.mdx-content ul,
+.mdx-content ol {
+  margin-bottom: 1.1rem;
+}
+
 .mdx-content ul {
-  list-style: disc;
-  padding-left: 1.5rem;
-  margin-bottom: 1rem;
+  list-style: none;
+  padding-left: 1.4rem;
+}
+
+.mdx-content ul > li {
+  position: relative;
+  margin-bottom: 0.4rem;
+}
+
+/* custom dash marker instead of default disc */
+.mdx-content ul > li::before {
+  content: "";
+  position: absolute;
+  left: -1.1rem;
+  top: 0.72em;
+  width: 0.55rem;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 1px;
 }
 
 .mdx-content ol {
   list-style: decimal;
-  padding-left: 1.5rem;
-  margin-bottom: 1rem;
+  padding-left: 1.6rem;
 }
 
-.mdx-content li {
-  margin-bottom: 0.35rem;
+.mdx-content ol > li {
+  margin-bottom: 0.4rem;
+}
+
+.mdx-content li > ul,
+.mdx-content li > ol {
+  margin-top: 0.4rem;
+  margin-bottom: 0;
 }
 
 .mdx-content li::marker {
@@ -96,69 +229,200 @@ html {
 
 .mdx-content blockquote {
   border-left: 3px solid var(--accent);
-  background: var(--accent-soft);
-  padding: 0.75rem 1rem;
-  border-radius: 0 8px 8px 0;
+  padding: 0.25rem 0 0.25rem 1rem;
   margin: 1.5rem 0;
-  color: var(--fg);
+  color: var(--muted);
+  font-style: italic;
 }
 
+/* tables: minimal, roomy, zebra-free */
 .mdx-content table {
   width: 100%;
   border-collapse: collapse;
   margin: 1.5rem 0;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
 }
 
 .mdx-content th,
 .mdx-content td {
-  border: 1px solid var(--border);
-  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  padding: 0.65rem 0.9rem;
   text-align: left;
+  vertical-align: top;
 }
 
-.mdx-content th {
-  background: var(--card);
-  font-weight: 600;
+.mdx-content thead th {
+  border-bottom: 2px solid var(--border);
+  font-weight: 650;
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.mdx-content tbody tr:last-child td {
+  border-bottom: none;
 }
 
 /* inline code */
 .mdx-content :not(pre) > code {
   background: var(--code-bg);
-  border: 1px solid var(--border);
   padding: 0.15em 0.4em;
-  border-radius: 6px;
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.875em;
+  border-radius: 5px;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.855em;
+  color: var(--accent);
+  border: 1px solid var(--border);
+  white-space: nowrap;
 }
 
-/* code blocks */
-.mdx-content pre {
-  background: var(--code-bg) !important;
-  border: 1px solid var(--border);
+/* ------------------------------------------------------------------ */
+/* Code blocks: dark terminal style in both themes, with filename bar  */
+/* ------------------------------------------------------------------ */
+
+.mdx-content .codeblock {
+  margin: 1.5rem 0;
   border-radius: 10px;
-  padding: 1rem 1.25rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.mdx-content .codeblock-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #17171a;
+  border-bottom: 1px solid #2a2a30;
+  padding: 0.45rem 1rem;
+}
+
+.mdx-content .codeblock-lang {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8f959e;
+}
+
+.mdx-content .copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: 1px solid #2f3238;
+  border-radius: 6px;
+  color: #a3a7ad;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 0.2rem 0.55rem;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.mdx-content .copy-btn:hover {
+  color: #ececee;
+  border-color: #4a4e55;
+}
+
+.mdx-content .copy-btn.copied {
+  color: #9ece6a;
+  border-color: #3a4a2f;
+}
+
+.mdx-content .codeblock pre {
+  background: var(--hljs-bg) !important;
+  margin: 0;
+  padding: 0.9rem 1.1rem;
   overflow-x: auto;
-  margin: 1.25rem 0 1.5rem;
-  font-size: 0.875rem;
-  line-height: 1.6;
+  font-size: 0.855rem;
+  line-height: 1.65;
+  border: none;
+  border-radius: 0;
+}
+
+.mdx-content .codeblock pre code {
+  background: transparent !important;
+  padding: 0;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  white-space: pre;
+}
+
+/* fallback (codeblock wrapper applied via rehype) */
+.mdx-content pre {
+  background: var(--hljs-bg);
+  color: var(--hljs-base);
+  padding: 0.9rem 1.1rem;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 0.855rem;
+  line-height: 1.65;
+  margin: 1.5rem 0;
 }
 
 .mdx-content pre code {
-  background: transparent !important;
-  padding: 0 !important;
-  border: none !important;
-  font-family: var(--font-geist-mono), monospace;
+  background: transparent;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-/* horizontal rule */
+/* hr: subtle */
 .mdx-content hr {
   border: none;
   border-top: 1px solid var(--border);
-  margin: 2.5rem 0;
+  margin: 2.75rem 0;
 }
 
 .mdx-content strong {
   font-weight: 700;
+}
+
+/* ------------------------------ header ---------------------------- */
+
+.site-header {
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.keploy-mark {
+  color: var(--accent);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+/* ------------------------------ TOC ------------------------------- */
+
+.toc-link {
+  display: block;
+  padding: 0.28rem 0 0.28rem 0.9rem;
+  border-left: 2px solid transparent;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.toc-link:hover {
   color: var(--fg);
+}
+
+.toc-link.active {
+  color: var(--fg);
+  border-left-color: var(--accent);
+  font-weight: 550;
+}
+
+.toc-link.toc-h3 {
+  padding-left: 1.7rem;
+  font-size: 0.78rem;
+}
+
+/* nav underline links in header */
+.header-link {
+  color: var(--muted);
+  font-size: 0.85rem;
+  transition: color 0.15s;
+}
+
+.header-link:hover {
+  color: var(--accent);
 }

@@ -28,9 +28,9 @@ export function ThemeToggle() {
       onClick={toggle}
       aria-label="Toggle dark mode"
       title="Toggle dark / light mode"
-      className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card)] text-base transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
+      className="flex h-8 w-8 items-center justify-center rounded-md border border-[var(--border)] bg-[var(--card)] text-xs transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
     >
-      {theme === "dark" ? "☀️" : "🌙"}
+      {theme === "dark" ? "☀" : "☾"}
     </button>
   );
 }

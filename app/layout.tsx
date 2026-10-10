@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Toc } from "@/components/toc";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,46 +45,78 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body className="min-h-screen bg-[var(--bg)] text-[var(--fg)] font-sans antialiased transition-colors">
-        <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg)]/80 backdrop-blur">
-          <div className="mx-auto flex h-14 w-full max-w-4xl items-center justify-between px-4 sm:px-6">
-            <a href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-              <span className="text-[var(--accent)]">▮</span>
-              Keploy <span className="text-[var(--muted)] font-normal">Go Tutorial</span>
-            </a>
-            <div className="flex items-center gap-3 text-sm">
+      <body className="min-h-screen bg-[var(--bg)] text-[var(--fg)] font-sans antialiased">
+        <header className="site-header sticky top-0 z-50">
+          <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
+            <div className="flex items-center gap-3">
+              <a
+                href="https://keploy.io"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="keploy-mark text-lg"
+              >
+                keploy
+              </a>
+              <span
+                aria-hidden="true"
+                className="h-4 w-px bg-[var(--border)]"
+              />
+              <span className="text-sm text-[var(--muted)]">
+                Go Tutorial
+              </span>
+            </div>
+            <nav className="flex items-center gap-4">
+              <a
+                href="https://github.com/keploy/keploy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="header-link hidden sm:inline"
+              >
+                GitHub
+              </a>
               <a
                 href="https://keploy.io/docs"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[var(--muted)] transition-colors hover:text-[var(--fg)]"
+                className="header-link"
               >
-                Official Docs ↗
+                Docs
               </a>
               <ThemeToggle />
-            </div>
+            </nav>
           </div>
         </header>
-        {children}
-        <footer className="border-t border-[var(--border)] py-8 text-center text-sm text-[var(--muted)]">
-          Built with Next.js + MDX ·{" "}
-          <a
-            href="https://keploy.io"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline decoration-dotted underline-offset-4 hover:text-[var(--fg)]"
-          >
-            Keploy
-          </a>{" "}
-          ·{" "}
-          <a
-            href="https://github.com/keploy/samples-go/tree/main/gin-mongo"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline decoration-dotted underline-offset-4 hover:text-[var(--fg)]"
-          >
-            Sample app
-          </a>
+        <div className="mx-auto flex w-full max-w-6xl gap-10 px-4 sm:px-6">
+          <main className="min-w-0 flex-1 py-10 md:py-12">{children}</main>
+          <aside className="sticky top-24 hidden h-[calc(100vh-8rem)] w-56 shrink-0 self-start overflow-y-auto py-12 xl:block">
+            <Toc />
+          </aside>
+        </div>
+        <footer className="border-t border-[var(--border)] py-8">
+          <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-2 px-4 text-sm text-[var(--muted)] sm:flex-row sm:px-6">
+            <p>
+              Built with Next.js and MDX. Part of a Keploy DevRel candidate
+              assignment.
+            </p>
+            <p className="flex items-center gap-4">
+              <a
+                href="https://keploy.io"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[var(--accent)]"
+              >
+                keploy.io
+              </a>
+              <a
+                href="https://github.com/khushi-infinity/Made-easy-keploy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[var(--accent)]"
+              >
+                Source
+              </a>
+            </p>
+          </div>
         </footer>
       </body>
     </html>

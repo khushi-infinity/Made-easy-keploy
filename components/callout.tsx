@@ -28,17 +28,17 @@ export function Callout({
 }) {
   const label = title ?? type;
   return (
-    <aside className="my-5 rounded-lg border border-[var(--border)] bg-[var(--card)]/70 p-4">
-      <p className={`mb-2 ${PILLER[type] ?? PILLER.note}`}>
+    <aside className="my-6 rounded-xl border border-[var(--border)] bg-[var(--card)]/80 p-5">
+      <p className={`mb-2.5 ${PILLER[type] ?? PILLER.note}`}>
         <span
           aria-hidden="true"
-          className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-current text-[9px] font-bold leading-none"
+          className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-current text-[10px] font-black leading-none"
         >
           {ICON[type] ?? ICON.info}
         </span>
-        {label}
+        <span className="normal-case tracking-normal text-[13px] font-semibold">{label}</span>
       </p>
-      <div className="text-sm leading-relaxed text-[var(--fg)]">{children}</div>
+      <div className="text-[0.95rem] leading-relaxed text-[var(--fg)]">{children}</div>
     </aside>
   );
 }

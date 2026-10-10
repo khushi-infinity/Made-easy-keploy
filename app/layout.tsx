@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Toc } from "@/components/toc";
+import { Hero } from "@/components/hero";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -86,13 +87,18 @@ export default function RootLayout({
             </nav>
           </div>
         </header>
-        <div className="mx-auto flex w-full max-w-6xl gap-10 px-4 sm:px-6">
-          <main className="min-w-0 flex-1 py-10 md:py-12">{children}</main>
-          <aside className="sticky top-24 hidden h-[calc(100vh-8rem)] w-56 shrink-0 self-start overflow-y-auto py-12 xl:block">
-            <Toc />
-          </aside>
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 sm:px-6">
+          <Hero />
+          <div className="flex w-full gap-10">
+            <main className="mdx-content min-w-0 flex-1 py-4 md:py-6">
+              {children}
+            </main>
+            <aside className="sticky top-24 hidden h-[calc(100vh-8rem)] w-56 shrink-0 self-start overflow-y-auto py-6 xl:block">
+              <Toc />
+            </aside>
+          </div>
         </div>
-        <footer className="border-t border-[var(--border)] py-8">
+        <footer className="site-footer border-t border-[var(--border)] py-8">
           <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-2 px-4 text-sm text-[var(--muted)] sm:flex-row sm:px-6">
             <p>
               Built with Next.js and MDX. Part of a Keploy DevRel candidate

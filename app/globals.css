@@ -15,8 +15,20 @@
   --accent-hover: #e64a00;
   --accent-soft: #fff1ea;
 
-  --hljs-bg: #16161c;
-  --hljs-base: #d3d6dc;
+  --hljs-bg: #f6f8fa;
+  --hljs-base: #1f2328;
+  --code-head: #eceef1;
+  --code-head-border: #d8dce2;
+  --code-chip: #57606a;
+  --code-chip-border: #d0d7de;
+  --tok-keyword: #8250df;
+  --tok-string: #0a7c47;
+  --tok-title: #0550ae;
+  --tok-number: #9a6700;
+  --tok-comment: #6e7781;
+  --tok-attr: #1f2328;
+  --tok-deletion: #cf222e;
+  --tok-ok: #1a7f37;
 }
 
 :root[data-theme="dark"] {
@@ -30,8 +42,20 @@
   --accent-hover: #ff8f5c;
   --accent-soft: #1f150f;
 
-  --hljs-bg: #0a0b0d;
+  --hljs-bg: #16161c;
   --hljs-base: #c7cad1;
+  --code-head: #1c1d23;
+  --code-head-border: #292b32;
+  --code-chip: #9ba0a8;
+  --code-chip-border: #33363d;
+  --tok-keyword: #ff8f5c;
+  --tok-string: #a5d67a;
+  --tok-title: #7dcfff;
+  --tok-number: #e5c07b;
+  --tok-comment: #747a85;
+  --tok-attr: #d3d6dc;
+  --tok-deletion: #f7768e;
+  --tok-ok: #28c840;
 }
 
 html {
@@ -54,7 +78,8 @@ body {
 }
 
 /* ------------------------------------------------------------------ */
-/* Highlight.js (CSS vars so it follows the theme)                      */
+/* Highlight.js: light theme uses a soft gray surface (GitHub style),  */
+/* dark theme keeps the terminal black. Token colors are theme vars.   */
 /* ------------------------------------------------------------------ */
 
 .hljs {
@@ -63,7 +88,7 @@ body {
 }
 .hljs-comment,
 .hljs-quote {
-  color: #747a85;
+  color: var(--tok-comment);
   font-style: italic;
 }
 .hljs-keyword,
@@ -72,33 +97,33 @@ body {
 .hljs-doctag,
 .hljs-name,
 .hljs-strong {
-  color: #ff8f5c;
+  color: var(--tok-keyword);
 }
 .hljs-title,
 .hljs-title.function_,
 .hljs-built_in,
 .hljs-class {
-  color: #7dcfff;
+  color: var(--tok-title);
 }
 .hljs-string,
 .hljs-regexp,
 .hljs-addition,
 .hljs-attribute {
-  color: #a5d67a;
+  color: var(--tok-string);
 }
 .hljs-number,
 .hljs-symbol,
 .hljs-link,
 .hljs-meta {
-  color: #e5c07b;
+  color: var(--tok-number);
 }
 .hljs-attr,
 .hljs-variable,
 .hljs-template-variable {
-  color: #d3d6dc;
+  color: var(--tok-attr);
 }
 .hljs-deletion {
-  color: #f7768e;
+  color: var(--tok-deletion);
 }
 .hljs-emphasis {
   font-style: italic;
@@ -489,17 +514,17 @@ body {
   margin: 1.6rem 0;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid #26282e;
+  border: 1px solid var(--code-head-border);
   background: var(--hljs-bg);
-  box-shadow: 0 4px 16px -6px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .mdx-content .codeblock-head {
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  background: #1c1d23;
-  border-bottom: 1px solid #292b32;
+  background: var(--code-head);
+  border-bottom: 1px solid var(--code-head-border);
   padding: 0.5rem 0.95rem;
 }
 
@@ -508,7 +533,7 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.09em;
-  color: #8a909a;
+  color: var(--code-chip);
 }
 
 .mdx-content .copy-btn {
@@ -517,9 +542,9 @@ body {
   align-items: center;
   gap: 0.35rem;
   background: transparent;
-  border: 1px solid #33363d;
+  border: 1px solid var(--code-chip-border);
   border-radius: 6px;
-  color: #9ba0a8;
+  color: var(--code-chip);
   font-size: 0.72rem;
   font-weight: 600;
   padding: 0.22rem 0.6rem;
@@ -528,13 +553,13 @@ body {
 }
 
 .mdx-content .copy-btn:hover {
-  color: #ededef;
-  border-color: #4a4e55;
+  color: var(--fg);
+  border-color: var(--muted);
 }
 
 .mdx-content .copy-btn.copied {
-  color: #28c840;
-  border-color: #2d4428;
+  color: var(--tok-ok);
+  border-color: var(--tok-ok);
 }
 
 .mdx-content .codeblock pre {

@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Toc } from "@/components/toc";
 import { Hero } from "@/components/hero";
+import { ThemeInit } from "@/components/theme-init";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,6 +48,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="min-h-screen bg-[var(--bg)] text-[var(--fg)] font-sans antialiased">
+        <ThemeInit />
         <header className="site-header sticky top-0 z-50">
           <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
             <div className="flex items-center gap-3">

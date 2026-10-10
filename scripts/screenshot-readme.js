@@ -59,7 +59,8 @@ async function main() {
     await page.goto(`${BASE}/`, { waitUntil: 'networkidle', timeout: 30000 });
     await page.waitForTimeout(4500);
     const filePath = path.join(shotsDir, name);
-    await page.screenshot({ path: filePath, fullPage: true, type: 'png' });
+    // viewport-sized capture (normal desktop screenshot), not full page
+    await page.screenshot({ path: filePath, fullPage: false, type: 'png' });
     await page.close();
     console.log('SHOT', filePath);
   }
